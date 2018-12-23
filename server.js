@@ -4,11 +4,15 @@ const db = require("./config/config").mongoURI;
 const users = require("./routes/api/users");
 const issues = require("./routes/api/issues");
 const bodyParser = require("body-parser");
+const passport = require('passport');
 
 // this is required to access req.body
 const app = express();
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
+app.use(passport.initialize());
+require('./config/passport')(passport);
+
 mongoose
 .connect(db)
 .then(()=>console.log("connect to DB"))
