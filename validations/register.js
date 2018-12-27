@@ -20,7 +20,7 @@ module.exports = function validateRegisterInput(data) {
   }
 
   if (Validator.isEmpty(data.role)) {
-    errors.name = 'role field is required';
+    errors.role = 'role field is required';
   }
 
   if (Validator.isEmpty(data.email)) {
@@ -47,7 +47,7 @@ module.exports = function validateRegisterInput(data) {
     errors.password2 = 'Passwords must match';
   }
 
-  if (Validator.isEmpty(data.skills)) {
+  if (data.role === "employee" && Validator.isEmpty(data.skills)) {
     errors.skills = 'Skills field is required';
   }
 
