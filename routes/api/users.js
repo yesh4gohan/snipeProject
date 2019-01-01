@@ -84,7 +84,7 @@ router.post("/login", (req, res) => {
                 name: user.bio.name,
                 email: user.email
               };
-              jwt.sign(payLoad, secret, { expiresIn: 3600 }, (err, token) => {
+              jwt.sign(payLoad, secret, { expiresIn: 10 }, (err, token) => {
                 if (err) {
                   errors.server = "Internal server error";
                   return res.status(500).json(errors);

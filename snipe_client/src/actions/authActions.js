@@ -5,7 +5,6 @@ import setAuthToken from "../utils/setAuthToken";
 export const registerNewUser = (user,history) => dispatch => {
   axios.post('/api/users/register',user)
   .then(res =>{
-    console.log(res)
     history.push('/login')})
   .catch(error => {
     console.log(error)
@@ -23,7 +22,6 @@ export const loginUser = loginData => dispatch => {
     localStorage.setItem('jwtToken',token);
     setAuthToken(token);
     const decode = jwt_decode(token);
-    console.log(decode)
     dispatch(setCurrentUser(decode));
 
   })
@@ -38,6 +36,12 @@ export const loginUser = loginData => dispatch => {
 export const setCurrentUser = decodedUser => {
   return {
     type:SET_CURRENT_USER,
-    payloadd:decodedUser
+    payload:decodedUser
   }
+}
+
+export const logoutUser = () =>dispatch=> {
+  localStorage.removeItem('jwtToken');
+  setAuthToken(false);
+  dispatch(setCurrentUser({}));
 }

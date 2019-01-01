@@ -32,7 +32,6 @@ class Register extends Component {
   };
   onRadioChange = e => this.setState({ role: e.target.name });
   render() {
-    console.log(this.props.auth)
     return (
       <div className="register">
         <div className="container">

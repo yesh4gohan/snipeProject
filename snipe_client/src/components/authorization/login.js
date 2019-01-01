@@ -9,18 +9,18 @@ class Login extends Component {
       password:""
     };
   }
-  onSubmit = e => {
+  onSubmit = async e => {
     e.preventDefault();
     let {email,password} = this.state;
     let userObject = {
       email,
       password
     };
-    this.props.loginUser(userObject);
+    await this.props.loginUser(userObject);
+    // this.props.history.push("/homePage")
   }
   onChange = e => this.setState({[e.target.name]:e.target.value})
   render() {
-    console.log(this.props.auth)
     return (
       <div className="login">
         <div className="container">

@@ -1,3 +1,4 @@
+
 const express = require("express");
 const mongoose = require("mongoose");
 const db = require("./config/config").mongoURI;
@@ -14,7 +15,7 @@ app.use(passport.initialize());
 require('./config/passport')(passport);
 
 mongoose
-.connect(db)
+.connect(db,{ useNewUrlParser: true })
 .then(()=>console.log("connect to DB"))
 .catch((err)=>console.log({ERROR:err}))
 

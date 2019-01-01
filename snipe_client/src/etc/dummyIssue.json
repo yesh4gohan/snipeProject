@@ -1,0 +1,109 @@
+[{
+  "_id": {
+      "$oid": "5c1e8b987669890bb83d9989"
+  },
+  "language":"Java",
+  "issueType":"All Types",
+  "issueTitle": "issue1",
+  "issueDescription": "description for issue1",
+  "requests":1,
+  "views": 0,
+  "attachments": [],
+  "answerCount": 2,
+  "answers":[],
+  "date": {
+      "$date": "2018-12-22T19:08:09.003Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+      "$oid": "5c1e8b987669890bb83d9990"
+  },
+  "language":"JavaScript",
+  "issueType":"Run Time Error",
+  "issueTitle": "issue2",
+  "issueDescription": "description for issue2",
+  "requests":2,
+  "views": 10,
+  "attachments": [],
+  "answerCount": 2,
+  "answers":[],
+  "date": {
+      "$date": "2018-12-22T19:08:09.003Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+      "$oid": "5c1e8b987669890bb83d9991"
+  },
+  "language":"Python",
+  "issueType":"Run Time Error",
+  "issueTitle": "issue3",
+  "issueDescription": "description for issue3",
+  "requests":2,
+  "views": 5,
+  "attachments": [],
+  "answerCount": 0,
+  "answers":[],
+  "date": {
+      "$date": "2018-12-22T19:08:09.003Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+      "$oid": "5c1e8b987669890bb83d9992"
+  },
+  "language":"All Languages",
+  "issueType":"All Types",
+  "issueTitle": "issue4",
+  "issueDescription": "description for issue4",
+  "requests":1,
+  "views": 50,
+  "attachments": [],
+  "answerCount": 10,
+  "answers":[],
+  "date": {
+      "$date": "2018-12-22T19:08:09.003Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+      "$oid": "5c1e8b987669890bb83d9993"
+  },
+  "language":"Python",
+  "issueType":"Syntax error",
+  "issueTitle": "issue5",
+  "issueDescription": "description for issue5",
+  "requests":2,
+  "views": 10,
+  "attachments": [],
+  "answerCount": 2,
+  "answers":[],
+  "date": {
+      "$date": "2018-12-22T19:08:09.003Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+      "$oid": "5c1e8b987669890bb83d9994"
+  },
+  "language":"Python",
+  "issueType":"All Types",
+  "issueTitle": "issue6",
+  "issueDescription": "description for issue6",
+  "requests":2,
+  "views": 5,
+  "attachments": [],
+  "answerCount": 0,
+  "answers":[],
+  "date": {
+      "$date": "2018-12-22T19:08:09.003Z"
+  },
+  "__v": 0
+}
+]

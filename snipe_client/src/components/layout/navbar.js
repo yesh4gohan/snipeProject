@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import {Link} from "react-router-dom";
+import {connect} from "react-redux";
+import SearchBar from "../searchBar/searchBar";
 class NavBar extends Component {
   render() {
+    console.log(this.props.auth)
     return (
       <nav className="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
         <div className="container">
@@ -26,7 +29,7 @@ class NavBar extends Component {
                 </a>
               </li>
             </ul>
-
+          <SearchBar/>
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
                 <Link className="nav-link" to="/register">
@@ -45,4 +48,10 @@ class NavBar extends Component {
     );
   }
 }
-export default NavBar;
+const mapStateToProps = (state) => ({
+  auth:state.auth
+});
+const mapDispatchToProps = {
+
+}
+export default connect(mapStateToProps,mapDispatchToProps)(NavBar);
