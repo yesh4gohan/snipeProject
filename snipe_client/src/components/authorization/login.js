@@ -17,7 +17,7 @@ class Login extends Component {
       password
     };
     await this.props.loginUser(userObject);
-    // this.props.history.push("/homePage")
+     this.props.history.push("/userHomePage")
   }
   onChange = e => this.setState({[e.target.name]:e.target.value})
   render() {

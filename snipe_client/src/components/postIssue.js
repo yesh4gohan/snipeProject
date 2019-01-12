@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { issueLanguages } from "../etc/issueLanguages";
 import { issueTypes } from "../etc/issueTypes";
 import { connect } from "react-redux";
-import axios from "axios"
+import axios from "axios";
+import {withRouter} from "react-router-dom"
 // import {addTextFile} from "../actions/attachmentActions";
 class PostIssue extends Component {
   constructor(props) {
@@ -13,8 +14,7 @@ class PostIssue extends Component {
       markImportant: false,
       issueType: "",
       language: "",
-      imageAttachment:"",
-      textAttachment:""
+      Attachment: {}
     };
   }
   onChange = e => {
@@ -24,37 +24,88 @@ class PostIssue extends Component {
     this.setState({ markImportant: !this.state.markImportant });
   };
   onTextChange = e => {
-    let file = e.target.files[0];
-    let textType = /text.*/;
-    if (file.type.match(textType)) {
-      let reader = new FileReader();
-      reader.onload = () => {
-        this.setState({ textAttachment: reader.result });
-      };
-      reader.readAsText(file);
-    }
-    else{
-      window.alert("Incorrect file format!!!");
-    }
+    // let file = e.target.files[0];
+    // console.log(e.target.files[0])
+    // let textType = /text.*/;
+    // if (file.type.match(textType)) {
+    //   let reader = new FileReader();
+    //   reader.onload = () => {
+    //     console.log({READER:reader.result})
+    //     axios.post('http://localhost:9000/api/issues/addFile',reader.result)
+    //     .then(res => console.log("success"))
+    //     .catch(err => console.log(err))
+    //   };
+    //   reader.readAsArrayBuffer(file);
+    // }
+    // else{
+    //   window.alert("Incorrect file format!!!");
+    // }
+    this.setState({ Attachment: e.target.files[0] });
   };
   onImageChange = e => {
     let image = e.target.files[0];
+    // axios.post('/api/issues/addImage',image)
+    // .then(res => console.log("success"))
+    // .catch(err => console.log(err))
     let imageType = /image.*/;
-    if(image.type.match(imageType)){
+    if (image.type.match(imageType)) {
       let reader = new FileReader();
       reader.onload = () => {
-        this.setState({imageAttachment:reader.result})
-      }
-      reader.readAsDataURL(image);
+        console.log(reader.result);
+      };
+      reader.readAsBinaryString(image);
     }
-  }
+  };
   onSubmit = e => {
     e.preventDefault();
-    let payload = {...this.state};
-    console.log(payload)
-    axios.post('/api/issues/postIssue',payload)
-    .then(res=>console.log(res))
-  }
+    const formData = new FormData();
+    formData.append("attachment", this.state.Attachment);
+    const config = {
+      headers: {
+        "content-Type": "multipart/form-data"
+      }
+    };
+    let payload = {
+      issueTitle: this.state.issueTitle,
+      issueDescription: this.state.issueDescription,
+      markImportant: this.state.markImportant,
+      issueType: this.state.issueType,
+      language: this.state.language
+    };
+    axios
+      .post("http://localhost:9000/api/issues/postImage", formData, config)
+      .then(res => {
+        payload.attachments = `/${res.data.path}`;
+        axios.post("http://localhost:9000/api/issues/postIssue",payload)
+        .then(()=>{
+          this.props.history.push('/issuesList')
+        })
+        .catch(err=>console.log(err))
+      })
+      .catch(err => console.log(err));
+  };
+
+  // e.preventDefault();
+  //   console.log(this.state)
+  //   const formData = new FormData();
+
+  //   formData.append('attachment',this.state.textAttachment);
+  //   const payload = {
+  //     issueTitle: this.state.issueTitle,
+  //     issueDescription: this.state.issueDescription,
+  //     markImportant: this.state.markImportant,
+  //     issueType: this.state.issueType,
+  //     language: this.state.language,
+  //     textAttachment:formData
+  //   }
+  //   const config = {
+  //     headers:{
+  //       'content-Type':'multipart/form-data'
+  //     }
+  //   };
+  //   axios.post('http://localhost:9000/api/issues/postIssue',payload,config)
+  //   .then(res=>console.log(res))
+  //   .catch(err=>console.log(err))
   render() {
     return (
       <div className="post-form mb-3">
@@ -63,7 +114,7 @@ class PostIssue extends Component {
             Post your issue here...
           </div>
           <div className="card-body">
-            <form onSubmit = {this.onSubmit}>
+            <form onSubmit={this.onSubmit} enctype="multipart/form-data">
               <div className="form-group">
                 <input
                   type="title"
@@ -138,38 +189,23 @@ class PostIssue extends Component {
               </div>
               <div className="form-group" id="textIp">
                 <label className="form-input-label" htmlFor="textIp">
-                  Upload supporting text file
+                  Upload supporting files
                 </label>
                 <div className="file-field">
                   <div className="btn btn-primary btn-sm float-left">
-                    <input type="file" onChange={this.onTextChange} />
-                  </div>
-                  <div><pre>{this.state.textAttachment}</pre></div>
-                </div>
-              </div>
-              <div className="form-group" id="imageIp">
-                <label className="form-input-label" htmlFor="imageIp">
-                  Upload supporting Image
-                </label>
-                <div className="file-field">
-                  <div className="btn btn-primary btn-sm float-left">
-                    <input type="file" onChange = {this.onImageChange}/>
-                  </div>
-                  <div className="file-path-wrapper">
-                    <img
-                      src={this.state.imageAttachment}
-                      width = "50px"
-                      className="file-path validate"
-                      type="text"
-                      alt = ""
-                      placeholder="Upload Image Here"
+                    <input
+                      type="file"
+                      onChange={this.onTextChange}
+                      name="attachment"
                     />
                   </div>
                 </div>
               </div>
-              <button type="submit" className="btn btn-primary">
+              <div className="form-group">
+              <button type="submit" className="btn btn-primary float-left">
                 Submit
               </button>
+              </div>
             </form>
           </div>
         </div>
@@ -178,11 +214,11 @@ class PostIssue extends Component {
   }
 }
 
-const mapStateToProps = state => ({});
-const mapDisPatchToProps = {
-  
-};
-export default connect(
+const mapStateToProps = state => ({
+  currentIssue:state.currentIssue
+});
+const mapDisPatchToProps = {};
+export default withRouter(connect(
   mapStateToProps,
   mapDisPatchToProps
-)(PostIssue);
+)(PostIssue));

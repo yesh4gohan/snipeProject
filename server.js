@@ -1,4 +1,4 @@
-
+const cors = require('cors');
 const express = require("express");
 const mongoose = require("mongoose");
 const db = require("./config/config").mongoURI;
@@ -6,10 +6,29 @@ const users = require("./routes/api/users");
 const issues = require("./routes/api/issues");
 const bodyParser = require("body-parser");
 const passport = require('passport');
-
+const multer = require('multer');
+const path = require('path')
+//const fileFilter = require('./utils/multerConfig')
 // this is required to access req.body
 const app = express();
+
+const storage = multer.diskStorage({
+  destination: "./public/uploads/",
+  filename: function(req, file, cb){
+     cb(null,'DOC_' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits:{fileSize: 1000000},
+}).single("attachment");
+app.use(cors());
+// app.use(express.static(__dirname + 'public'));
+// app.use('/public/uploads',express.static(path.join(__dirname,'/uploads')));
+
 app.use(bodyParser.urlencoded({extended:false}));
+app.use(upload);
 app.use(bodyParser.json());
 app.use(passport.initialize());
 require('./config/passport')(passport);

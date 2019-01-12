@@ -3,6 +3,11 @@ import "./serchBar.css";
 import axios from "axios";
 import { issueLanguages } from "../../etc/issueLanguages";
 import { issueTypes } from "../../etc/issueTypes";
+import IssueList from "../issues/issuesComponent";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+import { setSearchResult } from "../../actions/searchActions";
+import { resolve } from "url";
 class SearchBar extends Component {
   state = {
     issues: [],
@@ -13,14 +18,20 @@ class SearchBar extends Component {
   };
   componentDidMount() {
     axios
-      .get('/api/issues/getIssues')
-      .then(res => this.setState({ issues: res.data }))
+      .get("http://localhost:9000/api/issues/getIssues")
+      .then(res => {
+        this.setState({
+          issues: res.data.filter(result => result.attachments != "")
+        });
+      })
       .catch(err => console.log(err));
   }
   searchFunction = e => {
     e.preventDefault();
-    let { issues, language, issueType, keyword, searchText } = this.state;
     let searchResult = [];
+    let prom = new Promise((resolve,reject)=> {
+      let { issues, language, issueType, keyword, searchText } = this.state;
+    
     let searchTerm = searchText.length ? searchText : keyword;
     if (issueType.length && language.length && searchTerm.length) {
       searchResult = issues.filter(
@@ -29,47 +40,45 @@ class SearchBar extends Component {
           language === issue.language &&
           issue.issueDescription.includes(searchTerm.trim())
       );
-    }
-    else if(issueType.length && language.length){
+    } else if (issueType.length && language.length) {
       searchResult = issues.filter(
-        issue =>
-          issueType === issue.issueType &&
-          language === issue.language
-      );      
-    }
-    else if(language.length && searchTerm.length){
+        issue => issueType === issue.issueType && language === issue.language
+      );
+    } else if (language.length && searchTerm.length) {
       searchResult = issues.filter(
         issue =>
           language === issue.language &&
           issue.issueDescription.includes(searchTerm.trim())
       );
-    }
-    else if(issueType.length && searchTerm.length){
+    } else if (issueType.length && searchTerm.length) {
       searchResult = issues.filter(
         issue =>
           issueType === issue.issueType &&
           issue.issueDescription.includes(searchTerm.trim())
       );
-    }
-    else if (issueType.length && !language.length && !searchTerm.length) {
-      searchResult = issues.filter(
-        issue => issueType === issue.issueType
+    } else if (issueType.length && !language.length && !searchTerm.length) {
+      searchResult = issues.filter(issue => issueType === issue.issueType);
+    } else if (!issueType.length && language.length && !searchTerm.length) {
+      searchResult = issues.filter(issue => language === issue.language);
+    } else if (!issueType.length && !language.length && searchTerm.length) {
+      searchResult = issues.filter(issue =>
+        issue.issueDescription.includes(searchTerm.trim())
       );
-    }
-    else if (!issueType.length && language.length && !searchTerm.length) {
-      searchResult = issues.filter(
-        issue =>language === issue.language
-      );
-    }
-    else if (!issueType.length && !language.length && searchTerm.length) {
-      searchResult = issues.filter(
-        issue => issue.issueDescription.includes(searchTerm.trim())
-      );
-    } 
-    else if(!issueType.length && !language.length && !searchTerm.length) {
+    } else if (!issueType.length && !language.length && !searchTerm.length) {
       searchResult = issues;
-    }   
-    console.log(searchResult); 
+    };
+    resolve();
+    })
+    prom.then(()=>{
+      this.setSearchResult(searchResult);
+    })
+  };
+  setSearchResult = searchResult => {
+    let prom = new Promise((res, rej) => {
+      this.props.setSearchResult(searchResult); 
+      res();
+    });
+    prom.then(() => this.props.history.push('/issuesList'));
   };
 
   onChange = e => {
@@ -115,7 +124,13 @@ class SearchBar extends Component {
                           >
                             {issueLanguages.map(issueLanguage => {
                               return (
-                                <option value={issueLanguage==="All Languages"?"":issueLanguage}>
+                                <option
+                                  value={
+                                    issueLanguage === "All Languages"
+                                      ? ""
+                                      : issueLanguage
+                                  }
+                                >
                                   {issueLanguage}
                                 </option>
                               );
@@ -131,7 +146,13 @@ class SearchBar extends Component {
                           >
                             {issueTypes.map(issueType => {
                               return (
-                                <option value={issueType === "All Types"?"":issueType}>{issueType}</option>
+                                <option
+                                  value={
+                                    issueType === "All Types" ? "" : issueType
+                                  }
+                                >
+                                  {issueType}
+                                </option>
                               );
                             })}
                           </select>
@@ -175,4 +196,13 @@ class SearchBar extends Component {
     );
   }
 }
-export default SearchBar;
+const mapStateToProps = state => ({
+  searchResult: state.searchResult
+});
+const mapDispatchToProps = {
+  setSearchResult
+};
+export default withRouter(connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SearchBar));

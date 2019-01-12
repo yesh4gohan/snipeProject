@@ -27,7 +27,11 @@ const IssueSchema = new Schema({
     default:0
   },
   answerCount:{
-    type:Number
+    type:Number,
+    default:0
+  },
+  attachments:{
+    type:String
   },
   answers:[{
     answer:{

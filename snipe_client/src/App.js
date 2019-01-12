@@ -2,9 +2,11 @@ import React, { Component } from "react";
 import "./App.css";
 import NavBar from "./components/layout/navbar";
 import LandingPage from "./components/layout/landingPage";
+import IssuesList from "./components/issues/issuesComponent"
 import Footer from "./components/layout/footer";
 import Register from "./components/authorization/register";
 import Login from "./components/authorization/login";
+import SingleIssue from "./components/issues/singleIssueComponent";
 import {Provider} from "react-redux";
 import {BrowserRouter as Router,Route,Switch} from "react-router-dom";
 import store from "./store";
@@ -46,6 +48,8 @@ class App extends Component {
           <Route exact path = "/login" component = {Login}/>
           <Route exact path = "/register" component = {Register}/>
           <Route exact path = "/userHomePage" component = {UserHomePage}/>
+          <Route exact path = "/issuesList" component = {IssuesList}/>
+          <Route exaxt path = "/singleIssue" component = {SingleIssue}/>
           <Switch>
           {/* <PrivateRoute exact path = "/homePage" component = {HomePage}/> */}
           </Switch>

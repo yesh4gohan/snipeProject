@@ -1,18 +1,13 @@
 const mongoose = require('mongoose');
-const schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 const AnswerSchema = new Schema({
   answerDescription:{
     type:String,
     required:true
   },
-  imageAttachment:{
-    type:Schema.Types.ObjectId,
-    ref:"img"
-  },
-  textAttachment:{
-    type:Schema.Types.ObjectId,
-    ref:"files"
+  attachments:{
+    type:String
   },
   upVotes:{
     type:Number,
