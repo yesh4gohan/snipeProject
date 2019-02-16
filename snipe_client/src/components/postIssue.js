@@ -3,7 +3,7 @@ import { issueLanguages } from "../etc/issueLanguages";
 import { issueTypes } from "../etc/issueTypes";
 import { connect } from "react-redux";
 import axios from "axios";
-import {withRouter} from "react-router-dom"
+import { withRouter } from "react-router-dom";
 // import {addTextFile} from "../actions/attachmentActions";
 class PostIssue extends Component {
   constructor(props) {
@@ -12,13 +12,15 @@ class PostIssue extends Component {
       issueTitle: "",
       issueDescription: "",
       markImportant: false,
-      issueType: "",
-      language: "",
+      issueType: "Select One",
+      language: "Select One",
       Attachment: {}
     };
   }
   onChange = e => {
+   
     this.setState({ [e.target.name]: e.target.value });
+
   };
   onCheck = e => {
     this.setState({ markImportant: !this.state.markImportant });
@@ -76,11 +78,12 @@ class PostIssue extends Component {
       .post("http://localhost:9000/api/issues/postImage", formData, config)
       .then(res => {
         payload.attachments = `/${res.data.path}`;
-        axios.post("http://localhost:9000/api/issues/postIssue",payload)
-        .then(()=>{
-          this.props.history.push('/issuesList')
-        })
-        .catch(err=>console.log(err))
+        axios
+          .post("http://localhost:9000/api/issues/postIssue", payload)
+          .then(() => {
+            this.props.history.push("/issuesList");
+          })
+          .catch(err => console.log(err));
       })
       .catch(err => console.log(err));
   };
@@ -142,12 +145,15 @@ class PostIssue extends Component {
                   class="form-control form-control-lg"
                   name="language"
                   onChange={this.onChange}
+                  defaultValue = "Select One"
                 >
                   {issueLanguages.map(issueLanguage => {
                     return (
                       <option
                         value={
-                          issueLanguage === "All Languages" ? "" : issueLanguage
+                          issueLanguage === "All Languages"
+                            ? "Select One"
+                            : issueLanguage
                         }
                       >
                         {issueLanguage}
@@ -162,13 +168,17 @@ class PostIssue extends Component {
                   class="form-control form-control-lg"
                   name="issueType"
                   onChange={this.onChange}
+                  defaultValue = "Select One"
                 >
                   {issueTypes.map(issueType => {
                     return (
                       <option
-                        value={issueType === "All Types" ? "" : issueType}
+                        value={
+                          issueType === "All Types" ? "Select One" : issueType
+                        }
                       >
                         {issueType}
+                      
                       </option>
                     );
                   })}
@@ -202,9 +212,9 @@ class PostIssue extends Component {
                 </div>
               </div>
               <div className="form-group">
-              <button type="submit" className="btn btn-primary float-left">
-                Submit
-              </button>
+                <button type="submit" className="btn btn-info">
+                  Submit
+                </button>
               </div>
             </form>
           </div>
@@ -215,10 +225,12 @@ class PostIssue extends Component {
 }
 
 const mapStateToProps = state => ({
-  currentIssue:state.currentIssue
+  currentIssue: state.currentIssue
 });
 const mapDisPatchToProps = {};
-export default withRouter(connect(
-  mapStateToProps,
-  mapDisPatchToProps
-)(PostIssue));
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDisPatchToProps
+  )(PostIssue)
+);

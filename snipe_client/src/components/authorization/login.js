@@ -1,25 +1,39 @@
 import React, { Component } from "react";
-import {connect} from "react-redux";
-import {loginUser} from "../../actions/authActions"
+import { connect } from "react-redux";
+import { withRouter, Link } from "react-router-dom";
+import classnames from 'classnames';
+
+import { loginUser, getCurrentUserDetails } from "../../actions/authActions";
 class Login extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
-      email:"",
-      password:""
+      email: "",
+      password: "",
+      errors:{}
     };
   }
   onSubmit = async e => {
+    
     e.preventDefault();
-    let {email,password} = this.state;
+    let { email, password } = this.state;
     let userObject = {
       email,
       password
     };
-    await this.props.loginUser(userObject);
-     this.props.history.push("/userHomePage")
+    await this.props.loginUser(userObject, this.props.history);
+    console.log(this.state.errors)
   }
-  onChange = e => this.setState({[e.target.name]:e.target.value})
+
+  componentWillReceiveProps(nextProps, prevState) {
+    console.log("hi")
+    if (Object.keys(nextProps.errors).length) {
+      console.log(Object.keys(nextProps.errors).length)
+      this.setState({errors:nextProps.errors})
+    }
+  }
+
+  onChange = e => this.setState({ [e.target.name]: e.target.value });
   render() {
     return (
       <div className="login">
@@ -34,25 +48,34 @@ class Login extends Component {
                 <div className="form-group">
                   <input
                     type="email"
-                    className="form-control form-control-lg"
+                    className={classnames('form-control form-control-lg', {
+                      'is-invalid': this.state.errors.email
+                    })}
                     placeholder="Email Address"
                     name="email"
-                    value = {this.state.email}
-                    onChange = {this.onChange}                   
+                    value={this.state.email}
+                    onChange={this.onChange}
                   />
+                  {this.state.errors.email && <div className="invalid-feedback">{this.state.errors.email}</div>}
                 </div>
                 <div className="form-group">
                   <input
                     type="password"
-                    className="form-control form-control-lg"
+                    className={classnames('form-control form-control-lg', {
+                      'is-invalid': this.state.errors.password
+                    })}
                     placeholder="Password"
                     name="password"
-                    value = {this.state.password}
-                    onChange = {this.onChange}
+                    value={this.state.password}
+                    onChange={this.onChange}
                   />
+                  {this.state.errors.password && <div className="invalid-feedback">{this.state.errors.password}</div>}
                 </div>
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
+              <div>
+                <Link to="/"><h5>Continue without Sign in...</h5></Link>
+              </div>
             </div>
           </div>
         </div>
@@ -61,10 +84,16 @@ class Login extends Component {
   }
 }
 const mapStateToProps = state => ({
-  auth:state.auth,
-  errors:state.errors
+  auth: state.auth,
+  errors: state.errors
 });
 const mapDispatchToProps = {
-  loginUser
-}
-export default connect(mapStateToProps,mapDispatchToProps)(Login);
+  loginUser,
+  getCurrentUserDetails
+};
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Login)
+);

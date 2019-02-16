@@ -1,16 +1,21 @@
 import React, { Component } from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
+import {logoutUser} from "../../actions/authActions";
+import {withRouter} from "react-router-dom";
 import SearchBar from "../searchBar/searchBar";
 class NavBar extends Component {
+  logout = async () => {
+    await this.props.logoutUser();
+    this.props.history.push("/login");
+  }
   render() {
-    console.log(this.props.auth)
     return (
       <nav className="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
         <div className="container">
-          <a className="navbar-brand" href="landing.html">
+          <Link className="navbar-brand" to = "/">
             Snipe Community
-          </a>
+          </Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -21,16 +26,9 @@ class NavBar extends Component {
           </button>
 
           <div className="collapse navbar-collapse" id="mobile-nav">
-            <ul className="navbar-nav mr-auto">
-              <li className="nav-item">
-                <a className="nav-link" href="profiles.html">
-                  {" "}
-                  Developers
-                </a>
-              </li>
-            </ul>
+            
           <SearchBar/>
-            <ul className="navbar-nav ml-auto">
+            {!this.props.auth.isAuthenticated?<ul className="navbar-nav ml-auto">
               <li className="nav-item">
                 <Link className="nav-link" to="/register">
                   Sign Up
@@ -41,7 +39,7 @@ class NavBar extends Component {
                   Login
                 </Link>
               </li>
-            </ul>
+            </ul>:<button className = "btn btn-danger" onClick = {this.logout}>Logout</button>}
           </div>
         </div>
       </nav>
@@ -52,6 +50,6 @@ const mapStateToProps = (state) => ({
   auth:state.auth
 });
 const mapDispatchToProps = {
-
+  logoutUser
 }
-export default connect(mapStateToProps,mapDispatchToProps)(NavBar);
+export default withRouter(connect(mapStateToProps,mapDispatchToProps)(NavBar));

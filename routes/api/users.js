@@ -7,7 +7,7 @@ const validateRegisterInput = require("../../validations/register");
 const validateLoginInput = require("../../validations/login");
 const secret = require("../../config/config").secretOrKey;
 const passport = require("passport");
-
+const UserSchema = require("../../models/User");
 //@route GET api/users/test
 //@desc Test the route
 //@access Public
@@ -43,6 +43,7 @@ router.post("/register", (req, res) => {
           userObject.bio.skills.push(skill);
         }
       }
+      
       const newUser = new User(userObject);
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -82,9 +83,10 @@ router.post("/login", (req, res) => {
               const payLoad = {
                 id: user.id,
                 name: user.bio.name,
-                email: user.email
+                email: user.email,
+                role: user.role
               };
-              jwt.sign(payLoad, secret, { expiresIn: 10 }, (err, token) => {
+              jwt.sign(payLoad, secret, { expiresIn: 100 }, (err, token) => {
                 if (err) {
                   errors.server = "Internal server error";
                   return res.status(500).json(errors);
@@ -117,15 +119,34 @@ router.post("/login", (req, res) => {
 // @route   GET api/users/current
 // @desc    Return current user
 // @access  Private
+// router.get(
+//   "/current",
+//   passport.authenticate("jwt", { session: false }),
+//   (req, res) => {
+//     res.json({
+//       id: req.user.id,
+//       name: req.user.bio.name,
+//       email: req.user.email,
+//       role: req.user.role
+//     });
+//   }
+// );
+
+router.get("/getCurrentUser/:id", (req, res) => {
+  const id = req.params.id;
+  UserSchema.findById(id)
+    .then(user => res.json(user))
+    .catch(err => console.log(err));
+});
+
 router.get(
-  "/current",
+  "/getAllEmployees",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    res.json({
-      id: req.user.id,
-      name: req.user.bio.name,
-      email: req.user.email
-    });
+    UserSchema.find()
+      .sort()
+      .then(results => res.json(results))
+      .catch(err => console.log(err));
   }
 );
 

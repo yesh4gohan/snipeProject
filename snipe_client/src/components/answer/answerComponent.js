@@ -1,19 +1,17 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 class AnswerComponent extends Component {
   state = {
     answerDescription: "",
     attachment: {}
   };
   onChange = e => {
-    this.setState({answerDescription:e.target.value})
+    this.setState({ answerDescription: e.target.value });
   };
   onSubmit = e => {
     e.preventDefault();
-    console.log("CHECKEDDFBFBGFBGFBFGBFGNB GFNGHNGNGNGNGFF")
-
     const formData = new FormData();
     formData.append("attachment", this.state.attachment);
     const config = {
@@ -22,19 +20,20 @@ class AnswerComponent extends Component {
       }
     };
     let payload = {
-      issueId:this.props.currentIssue._id,
+      issueId: this.props.currentIssue._id,
       answerDescription: this.state.answerDescription
     };
-    console.log(this.props.currentIssue)
+    console.log(this.props.currentIssue);
     axios
       .post("http://localhost:9000/api/issues/postImage", formData, config)
       .then(res => {
         payload.attachments = `/${res.data.path}`;
-        axios.post("http://localhost:9000/api/issues/postAnswer",payload)
-        .then(()=>{
-          this.props.history.push('/userHomePage')
-        })
-        .catch(err=>console.log(err))
+        axios
+          .post("http://localhost:9000/api/issues/postAnswer", payload)
+          .then(() => {
+            this.props.history.push("/userHomePage");
+          })
+          .catch(err => console.log(err));
       })
       .catch(err => console.log(err));
   };
@@ -71,7 +70,7 @@ class AnswerComponent extends Component {
               </div>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary float-left">
+          <button type="submit" className="btn btn-info mt-4">
             Submit
           </button>
         </form>

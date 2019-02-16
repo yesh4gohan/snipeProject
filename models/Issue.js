@@ -30,9 +30,9 @@ const IssueSchema = new Schema({
     type:Number,
     default:0
   },
-  attachments:{
+  attachments:[{
     type:String
-  },
+  }],
   answers:[{
     answer:{
       type:Schema.Types.ObjectId,

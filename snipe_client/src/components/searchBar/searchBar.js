@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import "./serchBar.css";
-import axios from "axios";
 import { issueLanguages } from "../../etc/issueLanguages";
 import { issueTypes } from "../../etc/issueTypes";
-import IssueList from "../issues/issuesComponent";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { setSearchResult } from "../../actions/searchActions";
-import { resolve } from "url";
+import { fetchAllIssues } from "../../apiCalls/api";
 class SearchBar extends Component {
   state = {
     issues: [],
@@ -17,68 +15,93 @@ class SearchBar extends Component {
     searchText: ""
   };
   componentDidMount() {
-    axios
-      .get("http://localhost:9000/api/issues/getIssues")
-      .then(res => {
-        this.setState({
-          issues: res.data.filter(result => result.attachments != "")
-        });
-      })
-      .catch(err => console.log(err));
+    fetchAllIssues().then(res => {
+      this.setState({ issues: res });
+    });
   }
   searchFunction = e => {
     e.preventDefault();
     let searchResult = [];
-    let prom = new Promise((resolve,reject)=> {
+    let prom = new Promise((resolve, reject) => {
       let { issues, language, issueType, keyword, searchText } = this.state;
-    
-    let searchTerm = searchText.length ? searchText : keyword;
-    if (issueType.length && language.length && searchTerm.length) {
-      searchResult = issues.filter(
-        issue =>
-          issueType === issue.issueType &&
-          language === issue.language &&
+
+      let searchTerm = searchText.length ? searchText : keyword;
+      if (
+        issueType.length &&
+        issueType !== "Select One" &&
+        (language.length && language !== "Select One") &&
+        searchTerm.length
+      ) {
+        searchResult = issues.filter(
+          issue =>
+            issueType === issue.issueType &&
+            language === issue.language &&
+            issue.issueDescription.includes(searchTerm.trim())
+        );
+      } else if (
+        issueType.length &&
+        issueType !== "Select One" &&
+        (language.length && language !== "Select One")
+      ) {
+        searchResult = issues.filter(
+          issue => issueType === issue.issueType && language === issue.language
+        );
+      } else if (
+        language.length &&
+        language !== "Select One" &&
+        searchTerm.length
+      ) {
+        searchResult = issues.filter(
+          issue =>
+            language === issue.language &&
+            issue.issueDescription.includes(searchTerm.trim())
+        );
+      } else if (
+        issueType.length &&
+        issueType !== "Select One" &&
+        searchTerm.length
+      ) {
+        searchResult = issues.filter(
+          issue =>
+            issueType === issue.issueType &&
+            issue.issueDescription.includes(searchTerm.trim())
+        );
+      } else if (
+        issueType.length &&
+        issueType !== "Select One" &&
+        (!language.length || language === "Select One") &&
+        !searchTerm.length
+      ) {
+        searchResult = issues.filter(issue => issueType === issue.issueType);
+      } else if (
+        (!issueType.length || issueType === "Select One") &&
+        (language.length && language !== "Select One") &&
+        !searchTerm.length
+      ) {
+        searchResult = issues.filter(issue => language === issue.language);
+      } else if (
+        (!issueType.length || issueType === "Select One") &&
+        (!language.length || language === "Select One") &&
+        searchTerm.length
+      ) {
+        searchResult = issues.filter(issue =>
           issue.issueDescription.includes(searchTerm.trim())
-      );
-    } else if (issueType.length && language.length) {
-      searchResult = issues.filter(
-        issue => issueType === issue.issueType && language === issue.language
-      );
-    } else if (language.length && searchTerm.length) {
-      searchResult = issues.filter(
-        issue =>
-          language === issue.language &&
-          issue.issueDescription.includes(searchTerm.trim())
-      );
-    } else if (issueType.length && searchTerm.length) {
-      searchResult = issues.filter(
-        issue =>
-          issueType === issue.issueType &&
-          issue.issueDescription.includes(searchTerm.trim())
-      );
-    } else if (issueType.length && !language.length && !searchTerm.length) {
-      searchResult = issues.filter(issue => issueType === issue.issueType);
-    } else if (!issueType.length && language.length && !searchTerm.length) {
-      searchResult = issues.filter(issue => language === issue.language);
-    } else if (!issueType.length && !language.length && searchTerm.length) {
-      searchResult = issues.filter(issue =>
-        issue.issueDescription.includes(searchTerm.trim())
-      );
-    } else if (!issueType.length && !language.length && !searchTerm.length) {
-      searchResult = issues;
-    };
-    resolve();
-    })
-    prom.then(()=>{
+        );
+      } else {
+        searchResult = issues;
+      }
+      resolve();
+    });
+    prom.then(() => {
       this.setSearchResult(searchResult);
-    })
+    });
   };
   setSearchResult = searchResult => {
     let prom = new Promise((res, rej) => {
-      this.props.setSearchResult(searchResult); 
+      this.props.setSearchResult(searchResult);
       res();
     });
-    prom.then(() => this.props.history.push('/issuesList'));
+    prom.then(() => this.props.history.push("/issuesList"));
   };
 
   onChange = e => {
@@ -127,7 +150,7 @@ class SearchBar extends Component {
                                 <option
                                   value={
                                     issueLanguage === "All Languages"
-                                      ? ""
+                                      ? "Select One"
                                       : issueLanguage
                                   }
                                 >
@@ -148,7 +171,9 @@ class SearchBar extends Component {
                               return (
                                 <option
                                   value={
-                                    issueType === "All Types" ? "" : issueType
+                                    issueType === "All Types"
+                                      ? "Select One"
+                                      : issueType
                                   }
                                 >
                                   {issueType}
@@ -202,7 +227,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   setSearchResult
 };
-export default withRouter(connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SearchBar));
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SearchBar)
+);

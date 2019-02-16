@@ -12,7 +12,6 @@ export class AnswersList extends Component {
       this.props.answerIds.map(answerObj => {
         fetchAnswersById(answerObj._id).then(res => {
           answerArray.push(res);
-          console.log(answerArray);
           this.setState({ answers: answerArray });
         });
       });
@@ -27,7 +26,7 @@ export class AnswersList extends Component {
           <div className="col-3"><button className = "btn btn-danger">Report spam</button></div>
           <div className="col-3"><span>Upvotes: </span>{answer.upVotes}</div>
           <div className="col-3"><button className = "btn btn-primary">Upvote</button></div>
-          <div className="col-3">{answer.attachments}</div>
+          <div className="col-3"><embed src={answer.attachments && answer.attachments.length && `http://localhost:9000${answer.attachments}`} style = {{width :"200px",height:"200px"}}/></div>
         </div>
       </div>
     ));

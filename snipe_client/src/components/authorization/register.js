@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-//import classnames from "classnames";
+import classnames from "classnames";
 import { connect } from "react-redux";
 import { registerNewUser } from "../../actions/authActions";
+import { withRouter } from "react-router-dom";
 class Register extends Component {
   constructor(props) {
     super(props);
@@ -11,12 +12,18 @@ class Register extends Component {
       email: "",
       password: "",
       password2: "",
-      skills:""
+      skills: "",
+      errors: {}
     };
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
+    }
   }
   onSubmit = e => {
     e.preventDefault();
-    let { role, name, email, password, password2,skills } = this.state;
+    let { role, name, email, password, password2, skills } = this.state;
     let userObj = {
       role,
       email,
@@ -43,7 +50,9 @@ class Register extends Component {
                 <h6>Choose Role</h6>
                 <div className="form-radio mb-4" id="role">
                   <input
-                    className="form-radio-input"
+                    className={classnames("form-control form-control-sm", {
+                      "is-invalid": this.state.errors.role
+                    })}
                     type="radio"
                     name="admin"
                     checked={this.state.role === "admin"}
@@ -56,7 +65,9 @@ class Register extends Component {
                 </div>
                 <div className="form-radio mb-4">
                   <input
-                    className="form-radio-input"
+                    className={classnames("form-control form-control-sm", {
+                      "is-invalid": this.state.errors.role
+                    })}
                     type="radio"
                     name="employee"
                     checked={this.state.role === "employee"}
@@ -66,38 +77,64 @@ class Register extends Component {
                   <label className="form-radio-label" htmlFor="employee">
                     Employee
                   </label>
+                  {this.state.errors.role && (
+                    <div className="invalid-feedback">
+                      {this.state.errors.role}
+                    </div>
+                  )}
                 </div>
                 <div className="form-group">
                   <input
                     type="text"
-                    className="form-control form-control-lg"
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": this.state.errors.name
+                    })}
                     placeholder="Name"
                     name="name"
                     onChange={this.onChange}
                     value={this.state.name}
                   />
+                  {this.state.errors.name && (
+                    <div className="invalid-feedback">
+                      {this.state.errors.name}
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <input
                     type="email"
-                    className="form-control form-control-lg"
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": this.state.errors.email
+                    })}
                     placeholder="Email Address"
                     name="email"
                     onChange={this.onChange}
                     value={this.state.email}
                   />
+                  {this.state.errors.email && (
+                    <div className="invalid-feedback">
+                      {this.state.errors.email}
+                    </div>
+                  )}
                 </div>
                 {this.state.role === "employee" ? (
                   <div className="form-group">
                     <input
                       type="text"
-                      className="form-control form-control-lg"
+                      className={classnames("form-control form-control-lg", {
+                        "is-invalid": this.state.errors.skills
+                      })}
                       placeholder="Skills"
                       name="skills"
-                      value = {this.state.skills}
-                      onChange = {this.onChange}
+                      value={this.state.skills}
+                      onChange={this.onChange}
                     />
+                    {this.state.errors.skills && (
+                      <div className="invalid-feedback">
+                        {this.state.errors.skills}
+                      </div>
+                    )}
                     <small className="form-text text-muted">
                       Please use comma separated values (eg.
                       HTML,CSS,JavaScript,PHP)
@@ -107,22 +144,36 @@ class Register extends Component {
                 <div className="form-group">
                   <input
                     type="password"
-                    className="form-control form-control-lg"
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": this.state.errors.password
+                    })}
                     placeholder="Password"
                     name="password"
                     onChange={this.onChange}
                     value={this.state.password}
                   />
+                  {this.state.errors.password && (
+                    <div className="invalid-feedback">
+                      {this.state.errors.password}
+                    </div>
+                  )}
                 </div>
                 <div className="form-group">
                   <input
                     type="password"
-                    className="form-control form-control-lg"
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": this.state.errors.password2
+                    })}
                     placeholder="Confirm Password"
                     name="password2"
                     onChange={this.onChange}
                     value={this.state.password2}
                   />
+                  {this.state.errors.password2 && (
+                    <div className="invalid-feedback">
+                      {this.state.errors.password2}
+                    </div>
+                  )}
                 </div>
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
@@ -142,7 +193,9 @@ const mapDispatchToProps = {
   registerNewUser
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Register);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Register)
+);
