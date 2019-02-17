@@ -3,6 +3,7 @@ const ImageInput = require("../../models/Image");
 const FileSchema = require("../../models/File");
 const IssueSchema = require("../../models/Issue");
 const AnswerSchema = require("../../models/Answer");
+const validateIssueInput = require('../../validations/issues');
 const fs = require("fs");
 const path = require("path");
 
@@ -65,18 +66,20 @@ router.get("/getIssues", (req, res) => {
   // res.send(data);
   IssueSchema.find()
     .sort()
-    .then(results => res.json(results));
+    .then(results => res.json(results))
+    .catch(err=>console.log(err))
 });
 
 router.post("/postImage", (req, res) => {
   const image = req.file;
-  if (!image) {
-    return res.status(400).json({ message: "Failed to Upload" });
-  }
   return res.status(200).json(image);
 });
 
 router.post("/postIssue", (req, res) => {
+  let { errors, isValid } = validateIssueInput(req.body);
+  if(!isValid){
+    return res.status(400).json(errors);
+  }
   let issueObj = { ...req.body };
   const issueDB = new IssueSchema(issueObj);
   issueDB
